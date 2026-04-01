@@ -7,7 +7,6 @@ function App() {
 
   const API = "http://localhost:5000/api/tasks";
 
-  // GET tasks
   const getTasks = async () => {
     const res = await axios.get(API);
     setTasks(res.data);
@@ -17,7 +16,6 @@ function App() {
     getTasks();
   }, []);
 
-  // ADD task
   const addTask = async () => {
     if (!title) return;
     await axios.post(API, { title });
@@ -25,13 +23,11 @@ function App() {
     getTasks();
   };
 
-  // DELETE task
   const deleteTask = async (id) => {
     await axios.delete(`${API}/${id}`);
     getTasks();
   };
 
-  // TOGGLE complete
   const toggleTask = async (task) => {
     await axios.put(`${API}/${task._id}`, {
       completed: !task.completed,
@@ -40,32 +36,52 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Task Manager</h1>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-md">
+        <h1 className="text-2xl font-bold mb-4 text-center">
+          Task Manager
+        </h1>
 
-      <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="New task"
-      />
-      <button onClick={addTask}>Add</button>
+        <div className="flex gap-2 mb-4">
+          <input
+            className="flex-1 border p-2 rounded"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="New task"
+          />
+          <button
+            className="bg-blue-500 text-white px-4 rounded"
+            onClick={addTask}
+          >
+            Add
+          </button>
+        </div>
 
-      <ul>
-        {tasks.map((task) => (
-          <li key={task._id}>
-            <span
-              onClick={() => toggleTask(task)}
-              style={{
-                textDecoration: task.completed ? "line-through" : "none",
-                cursor: "pointer",
-              }}
+        <ul className="space-y-2">
+          {tasks.map((task) => (
+            <li
+              key={task._id}
+              className="flex justify-between items-center bg-gray-50 p-2 rounded"
             >
-              {task.title}
-            </span>
-            <button onClick={() => deleteTask(task._id)}>X</button>
-          </li>
-        ))}
-      </ul>
+              <span
+                onClick={() => toggleTask(task)}
+                className={`cursor-pointer ${
+                  task.completed ? "line-through text-gray-400" : ""
+                }`}
+              >
+                {task.title}
+              </span>
+
+              <button
+                onClick={() => deleteTask(task._id)}
+                className="text-red-500"
+              >
+                ✕
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
