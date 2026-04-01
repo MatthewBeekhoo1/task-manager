@@ -8,7 +8,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  const API = "http://localhost:5000/api";
+  const API = "https://task-manager-backend-1fjt.onrender.com/";
 
   const headers = {
     headers: { Authorization: token }
