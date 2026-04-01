@@ -11,6 +11,11 @@ app.use(express.json());
 const taskRoutes = require("./routes/tasks");
 app.use("/api/tasks", taskRoutes);
 
+
+const authRoutes = require("./routes/auth");
+app.use("/api/auth", authRoutes);
+
+
 app.get("/", (req, res) => {
   res.send("API running");
 });

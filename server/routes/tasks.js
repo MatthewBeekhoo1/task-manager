@@ -1,22 +1,38 @@
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const router = express.Router();
 const Task = require("../models/Task");
 
+
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) return res.status(401).json({ message: "No token" });
+
+  try {
+    const verified = jwt.verify(token, "secretkey");
+    req.user = verified;
+    next();
+  } catch {
+    res.status(401).json({ message: "Invalid token" });
+  }
+};
+
+
 // CREATE
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   const task = new Task(req.body);
   const saved = await task.save();
   res.json(saved);
 });
 
 // READ
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   const tasks = await Task.find();
   res.json(tasks);
 });
 
 // UPDATE
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   const updated = await Task.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -26,7 +42,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // DELETE
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authMiddleware, async (req, res) => {
   await Task.findByIdAndDelete(req.params.id);
   res.json({ message: "Deleted" });
 });
