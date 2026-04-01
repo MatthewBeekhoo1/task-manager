@@ -6,7 +6,7 @@ require("dotenv").config();
 const app = express();
 
 app.use(cors({
-  origin: "*"
+  origin: "https://task-manager-pink-iota.vercel.app"
 }));
 app.use(express.json());
 
