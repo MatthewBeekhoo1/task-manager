@@ -8,7 +8,7 @@ function App() {
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  const API = "https://task-manager-backend-1fjt.onrender.com/";
+  const API = "https://task-manager-backend-1fjt.onrender.com";
 
   const headers = {
     headers: { Authorization: token }
@@ -16,7 +16,7 @@ function App() {
 
   const getTasks = async () => {
     if (!token) return;
-    const res = await axios.get(`${API}/tasks`, headers);
+    const res = await axios.get(`${API}/api/tasks`, headers);
     setTasks(res.data);
   };
 
@@ -25,35 +25,40 @@ function App() {
   }, [token]);
 
   const register = async () => {
-    await axios.post(`${API}/auth/register`, { email, password });
+    await axios.post(`${API}/api/auth/register`, { email, password });
     alert("Registered. Now login.");
   };
 
   const login = async () => {
-    const res = await axios.post(`${API}/auth/login`, { email, password });
+    const res = await axios.post(`${API}/api/auth/login`, { email, password });
     localStorage.setItem("token", res.data.token);
     setToken(res.data.token);
   };
 
   const addTask = async () => {
     if (!title) return;
-    await axios.post(`${API}/tasks`, { title }, headers);
+    await axios.post(`${API}/api/tasks`, { title }, headers);
     setTitle("");
     getTasks();
   };
 
   const deleteTask = async (id) => {
-    await axios.delete(`${API}/tasks/${id}`, headers);
+    await axios.delete(`${API}/api/tasks/${id}`, headers);
     getTasks();
   };
 
   const toggleTask = async (task) => {
     await axios.put(
-      `${API}/tasks/${task._id}`,
+      `${API}/api/tasks/${task._id}`,
       { completed: !task.completed },
       headers
     );
     getTasks();
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
   };
 
   if (!token) {
@@ -96,11 +101,20 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white p-6 rounded shadow w-96">
-        <h1 className="text-xl mb-4">Task Manager</h1>
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-xl">Task Manager</h1>
+          <button
+            className="text-sm text-red-500"
+            onClick={logout}
+          >
+            Logout
+          </button>
+        </div>
 
         <input
           className="border p-2 w-full mb-2"
           value={title}
+          placeholder="New task..."
           onChange={(e) => setTitle(e.target.value)}
         />
 
@@ -116,12 +130,17 @@ function App() {
             <li key={task._id} className="flex justify-between mb-2">
               <span
                 onClick={() => toggleTask(task)}
-                className={task.completed ? "line-through" : ""}
+                className={`cursor-pointer ${task.completed ? "line-through text-gray-400" : ""}`}
               >
                 {task.title}
               </span>
 
-              <button onClick={() => deleteTask(task._id)}>X</button>
+              <button
+                onClick={() => deleteTask(task._id)}
+                className="text-red-500 ml-2"
+              >
+                X
+              </button>
             </li>
           ))}
         </ul>
